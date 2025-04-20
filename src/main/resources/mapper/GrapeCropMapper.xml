@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.GrapeCropMapper">
+
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.GrapeCrop">
+        <id column="id" property="id"/>
+        <result column="crop_code" property="cropCode"/>
+        <result column="crop_name" property="cropName"/>
+        <result column="crop_type" property="cropType"/>
+        <result column="variety" property="variety"/>
+        <result column="growth_cycle" property="growthCycle"/>
+        <result column="suitable_soil" property="suitableSoil"/>
+        <result column="suitable_temp" property="suitableTemp"/>
+        <result column="plant_distance" property="plantDistance"/>
+        <result column="row_distance" property="rowDistance"/>
+        <result column="water_demand" property="waterDemand"/>
+        <result column="fertilizer_demand" property="fertilizerDemand"/>
+        <result column="pruning_method" property="pruningMethod"/>
+        <result column="disease_resistance" property="diseaseResistance"/>
+        <result column="pest_resistance" property="pestResistance"/>
+        <result column="color" property="color"/>
+        <result column="icon" property="icon"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, crop_code, crop_name, crop_type, variety, growth_cycle, suitable_soil, suitable_temp,
+        plant_distance, row_distance, water_demand, fertilizer_demand, pruning_method, 
+        disease_resistance, pest_resistance, color, icon, status, create_time, update_time, remark
+    </sql>
+    
+    <insert id="insert" parameterType="com.bishe.garden.entity.GrapeCrop" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO agri_crop (
+            crop_code, crop_name, crop_type, variety, growth_cycle, suitable_soil, suitable_temp,
+            plant_distance, row_distance, water_demand, fertilizer_demand, pruning_method, 
+            disease_resistance, pest_resistance, color, icon, status, remark
+        ) VALUES (
+            #{cropCode}, #{cropName}, #{cropType}, #{variety}, #{growthCycle}, #{suitableSoil}, #{suitableTemp},
+            #{plantDistance}, #{rowDistance}, #{waterDemand}, #{fertilizerDemand}, #{pruningMethod}, 
+            #{diseaseResistance}, #{pestResistance}, #{color}, #{icon}, #{status}, #{remark}
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.bishe.garden.entity.GrapeCrop">
+        UPDATE agri_crop
+        <set>
+            <if test="cropCode != null">crop_code = #{cropCode},</if>
+            <if test="cropName != null">crop_name = #{cropName},</if>
+            <if test="cropType != null">crop_type = #{cropType},</if>
+            <if test="variety != null">variety = #{variety},</if>
+            <if test="growthCycle != null">growth_cycle = #{growthCycle},</if>
+            <if test="suitableSoil != null">suitable_soil = #{suitableSoil},</if>
+            <if test="suitableTemp != null">suitable_temp = #{suitableTemp},</if>
+            <if test="plantDistance != null">plant_distance = #{plantDistance},</if>
+            <if test="rowDistance != null">row_distance = #{rowDistance},</if>
+            <if test="waterDemand != null">water_demand = #{waterDemand},</if>
+            <if test="fertilizerDemand != null">fertilizer_demand = #{fertilizerDemand},</if>
+            <if test="pruningMethod != null">pruning_method = #{pruningMethod},</if>
+            <if test="diseaseResistance != null">disease_resistance = #{diseaseResistance},</if>
+            <if test="pestResistance != null">pest_resistance = #{pestResistance},</if>
+            <if test="color != null">color = #{color},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM agri_crop WHERE id = #{id}
+    </delete>
+    
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectByCropCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        WHERE crop_code = #{cropCode}
+    </select>
+    
+    <select id="selectByCropName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        WHERE crop_name = #{cropName}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        ORDER BY id
+    </select>
+    
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        <where>
+            <if test="cropType != null and cropType != ''">
+                AND crop_type = #{cropType}
+            </if>
+            <if test="variety != null and variety != ''">
+                AND variety LIKE CONCAT('%', #{variety}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+    
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_crop
+        <where>
+            <if test="cropType != null and cropType != ''">
+                AND crop_type = #{cropType}
+            </if>
+            <if test="variety != null and variety != ''">
+                AND variety LIKE CONCAT('%', #{variety}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countByCondition" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM agri_crop
+        <where>
+            <if test="cropType != null and cropType != ''">
+                AND crop_type = #{cropType}
+            </if>
+            <if test="variety != null and variety != ''">
+                AND variety LIKE CONCAT('%', #{variety}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE agri_crop
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+    
+</mapper> 

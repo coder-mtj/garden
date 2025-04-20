@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.ToolUsageRecordMapper">
+    
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.ToolUsageRecord">
+        <id column="id" property="id" />
+        <result column="tool_id" property="toolId" />
+        <result column="employee_id" property="employeeId" />
+        <result column="usage_date" property="usageDate" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="usage_purpose" property="usagePurpose" />
+        <result column="usage_area" property="usageArea" />
+        <result column="usage_hours" property="usageHours" />
+        <result column="fuel_consumption" property="fuelConsumption" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+    
+    <resultMap id="DetailResultMap" type="com.bishe.garden.entity.ToolUsageRecord" extends="BaseResultMap">
+        <association property="tool" javaType="com.bishe.garden.entity.AgriculturalTool">
+            <id column="tool_id" property="id" />
+            <result column="tool_code" property="toolCode" />
+            <result column="tool_name" property="toolName" />
+            <result column="tool_type" property="toolType" />
+        </association>
+        <association property="employee" javaType="com.bishe.garden.entity.Employee">
+            <id column="employee_id" property="id" />
+            <result column="employee_no" property="employeeNo" />
+            <result column="name" property="name" />
+        </association>
+        <association property="employee.department" javaType="com.bishe.garden.entity.Department">
+            <id column="department_id" property="id" />
+            <result column="dept_name" property="deptName" />
+        </association>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, tool_id, employee_id, usage_date, start_time, end_time, 
+        usage_purpose, usage_area, usage_hours, fuel_consumption, status, create_time, update_time, remark
+    </sql>
+    
+    <sql id="Detail_Column_List">
+        t.id, t.tool_id, t.employee_id, t.usage_date, t.start_time, t.end_time, 
+        t.usage_purpose, t.usage_area, t.usage_hours, t.fuel_consumption, t.status, t.create_time, t.update_time, t.remark,
+        a.tool_code, a.tool_name, a.tool_type,
+        e.employee_no, e.name, d.id as department_id, d.dept_name
+    </sql>
+    
+    <insert id="insert" parameterType="com.bishe.garden.entity.ToolUsageRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO agri_tool_usage (
+            tool_id, employee_id, usage_date, start_time, end_time,
+            usage_purpose, usage_area, usage_hours, fuel_consumption, status, remark, create_time, update_time
+        ) VALUES (
+            #{toolId}, #{employeeId}, #{usageDate}, #{startTime}, #{endTime},
+            #{usagePurpose}, #{usageArea}, #{usageHours}, #{fuelConsumption}, #{status}, #{remark}, NOW(), NOW()
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.bishe.garden.entity.ToolUsageRecord">
+        UPDATE agri_tool_usage
+        <set>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="usagePurpose != null">usage_purpose = #{usagePurpose},</if>
+            <if test="usageArea != null">usage_area = #{usageArea},</if>
+            <if test="usageHours != null">usage_hours = #{usageHours},</if>
+            <if test="fuelConsumption != null">fuel_consumption = #{fuelConsumption},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateStatus">
+        UPDATE agri_tool_usage
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM agri_tool_usage
+        WHERE id = #{id}
+    </delete>
+    
+    <select id="selectById" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE t.id = #{id}
+    </select>
+    
+    <select id="selectByToolId" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE t.tool_id = #{toolId}
+        ORDER BY t.usage_date DESC, t.start_time DESC
+    </select>
+    
+    <select id="selectByEmployeeId" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE t.employee_id = #{employeeId}
+        ORDER BY t.usage_date DESC, t.start_time DESC
+    </select>
+    
+    <select id="selectByDateRange" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE 1=1
+        <if test="startDate != null">
+            AND t.usage_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND t.usage_date &lt;= #{endDate}
+        </if>
+        ORDER BY t.usage_date DESC, t.start_time DESC
+    </select>
+    
+    <select id="selectByCondition" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE 1=1
+        <if test="toolId != null">
+            AND t.tool_id = #{toolId}
+        </if>
+        <if test="employeeId != null">
+            AND t.employee_id = #{employeeId}
+        </if>
+        <if test="startDate != null">
+            AND t.usage_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND t.usage_date &lt;= #{endDate}
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+        ORDER BY t.usage_date DESC, t.start_time DESC
+    </select>
+    
+    <select id="selectByPage" resultMap="DetailResultMap">
+        SELECT <include refid="Detail_Column_List" />
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE 1=1
+        <if test="toolId != null">
+            AND t.tool_id = #{toolId}
+        </if>
+        <if test="employeeId != null">
+            AND t.employee_id = #{employeeId}
+        </if>
+        <if test="startDate != null">
+            AND t.usage_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND t.usage_date &lt;= #{endDate}
+        </if>
+        <if test="status != null">
+            AND t.status = #{status}
+        </if>
+        ORDER BY t.usage_date DESC, t.start_time DESC
+    </select>
+    
+    <select id="statisticsByTool" resultType="java.util.Map">
+        SELECT 
+            t.tool_id,
+            a.tool_name,
+            a.tool_code,
+            COUNT(*) as usage_count,
+            SUM(t.usage_hours) as total_hours
+        FROM agri_tool_usage t
+        LEFT JOIN agri_tool a ON t.tool_id = a.id
+        WHERE 1=1
+        <if test="startDate != null">
+            AND t.usage_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND t.usage_date &lt;= #{endDate}
+        </if>
+        GROUP BY t.tool_id, a.tool_name, a.tool_code
+        ORDER BY usage_count DESC
+    </select>
+    
+    <select id="statisticsByEmployee" resultType="java.util.Map">
+        SELECT 
+            t.employee_id,
+            e.name as employee_name,
+            e.employee_no,
+            COUNT(*) as usage_count,
+            SUM(t.usage_hours) as total_hours
+        FROM agri_tool_usage t
+        LEFT JOIN sys_employee e ON t.employee_id = e.id
+        WHERE 1=1
+        <if test="startDate != null">
+            AND t.usage_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND t.usage_date &lt;= #{endDate}
+        </if>
+        GROUP BY t.employee_id, e.name, e.employee_no
+        ORDER BY usage_count DESC
+    </select>
+    
+</mapper> 
+ 

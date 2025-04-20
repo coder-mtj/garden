@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.FieldMapper">
+
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.Field">
+        <id column="id" property="id"/>
+        <result column="field_code" property="fieldCode"/>
+        <result column="field_name" property="fieldName"/>
+        <result column="area" property="area"/>
+        <result column="soil_type" property="soilType"/>
+        <result column="irrigation_type" property="irrigationType"/>
+        <result column="location_x" property="locationX"/>
+        <result column="location_y" property="locationY"/>
+        <result column="position_data" property="positionData"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, field_code, field_name, area, soil_type, irrigation_type, location_x, location_y,
+        position_data, status, create_time, update_time, remark
+    </sql>
+    
+    <insert id="insert" parameterType="com.bishe.garden.entity.Field" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO agri_field (
+            field_code, field_name, area, soil_type, irrigation_type, location_x, location_y,
+            position_data, status, remark
+        ) VALUES (
+            #{fieldCode}, #{fieldName}, #{area}, #{soilType}, #{irrigationType}, #{locationX}, #{locationY},
+            #{positionData}, #{status}, #{remark}
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.bishe.garden.entity.Field">
+        UPDATE agri_field
+        <set>
+            <if test="fieldCode != null">field_code = #{fieldCode},</if>
+            <if test="fieldName != null">field_name = #{fieldName},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="soilType != null">soil_type = #{soilType},</if>
+            <if test="irrigationType != null">irrigation_type = #{irrigationType},</if>
+            <if test="locationX != null">location_x = #{locationX},</if>
+            <if test="locationY != null">location_y = #{locationY},</if>
+            <if test="positionData != null">position_data = #{positionData},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM agri_field WHERE id = #{id}
+    </delete>
+    
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_field
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectByFieldCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_field
+        WHERE field_code = #{fieldCode}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_field
+        ORDER BY id
+    </select>
+    
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_field
+        <where>
+            <if test="fieldName != null and fieldName != ''">
+                AND field_name LIKE CONCAT('%', #{fieldName}, '%')
+            </if>
+            <if test="soilType != null and soilType != ''">
+                AND soil_type = #{soilType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+    
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agri_field
+        <where>
+            <if test="fieldName != null and fieldName != ''">
+                AND field_name LIKE CONCAT('%', #{fieldName}, '%')
+            </if>
+            <if test="soilType != null and soilType != ''">
+                AND soil_type = #{soilType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countByCondition" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM agri_field
+        <where>
+            <if test="fieldName != null and fieldName != ''">
+                AND field_name LIKE CONCAT('%', #{fieldName}, '%')
+            </if>
+            <if test="soilType != null and soilType != ''">
+                AND soil_type = #{soilType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE agri_field
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+    
+</mapper> 

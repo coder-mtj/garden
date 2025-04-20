@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.EmployeeMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.Employee">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="employee_no" property="employeeNo" />
+        <result column="name" property="name" />
+        <result column="gender" property="gender" />
+        <result column="birth_date" property="birthDate" />
+        <result column="id_card" property="idCard" />
+        <result column="department_id" property="departmentId" />
+        <result column="position" property="position" />
+        <result column="entry_date" property="entryDate" />
+        <result column="salary" property="salary" />
+        <result column="status" property="status" />
+        <result column="address" property="address" />
+        <result column="emergency_contact" property="emergencyContact" />
+        <result column="emergency_phone" property="emergencyPhone" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 结果映射（包含用户和部门信息） -->
+    <resultMap id="EmployeeWithUserAndDeptMap" type="com.bishe.garden.entity.Employee" extends="BaseResultMap">
+        <association property="user" javaType="com.bishe.garden.entity.User">
+            <id column="u_id" property="id" />
+            <result column="u_username" property="username" />
+            <result column="u_real_name" property="realName" />
+            <result column="u_status" property="status" />
+        </association>
+        <association property="department" javaType="com.bishe.garden.entity.Department">
+            <id column="d_id" property="id" />
+            <result column="d_dept_code" property="deptCode" />
+            <result column="d_dept_name" property="deptName" />
+        </association>
+    </resultMap>
+    
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, user_id, employee_no, name, gender, birth_date, id_card, department_id, position, 
+        entry_date, salary, status, address, emergency_contact, emergency_phone, 
+        create_time, update_time
+    </sql>
+    
+    <!-- 带关联的列列表 -->
+    <sql id="With_Join_Column_List">
+        e.id, e.user_id, e.employee_no, e.name, e.gender, e.birth_date, e.id_card, e.department_id, e.position, 
+        e.entry_date, e.salary, e.status, e.address, e.emergency_contact, e.emergency_phone, 
+        e.create_time, e.update_time,
+        u.id as u_id, u.username as u_username, u.real_name as u_real_name, u.status as u_status,
+        d.id as d_id, d.dept_code as d_dept_code, d.dept_name as d_dept_name
+    </sql>
+    
+    <!-- 插入职工 -->
+    <insert id="insert" parameterType="com.bishe.garden.entity.Employee" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_employee (
+            user_id, employee_no, name, gender, birth_date, id_card, department_id, position, 
+            entry_date, salary, status, address, emergency_contact, emergency_phone, 
+            create_time, update_time
+        ) VALUES (
+            #{userId}, #{employeeNo}, #{name}, #{gender}, #{birthDate}, #{idCard}, #{departmentId}, #{position}, 
+            #{entryDate}, #{salary}, #{status}, #{address}, #{emergencyContact}, #{emergencyPhone}, 
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+    
+    <!-- 更新职工 -->
+    <update id="update" parameterType="com.bishe.garden.entity.Employee">
+        UPDATE sys_employee
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="employeeNo != null">employee_no = #{employeeNo},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="entryDate != null">entry_date = #{entryDate},</if>
+            <if test="salary != null">salary = #{salary},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="emergencyContact != null">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyPhone != null">emergency_phone = #{emergencyPhone},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 根据ID删除职工 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM sys_employee WHERE id = #{id}
+    </delete>
+    
+    <!-- 根据ID查询职工 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询职工 -->
+    <select id="selectByUserId" parameterType="java.lang.Long" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.user_id = #{userId}
+    </select>
+    
+    <!-- 根据工号查询职工 -->
+    <select id="selectByEmployeeNo" parameterType="java.lang.String" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.employee_no = #{employeeNo}
+    </select>
+    
+    <!-- 根据身份证号查询职工 -->
+    <select id="selectByIdCard" parameterType="java.lang.String" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.id_card = #{idCard}
+    </select>
+    
+    <!-- 查询所有职工 -->
+    <select id="selectAll" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        ORDER BY e.id
+    </select>
+    
+    <!-- 根据部门ID查询职工 -->
+    <select id="selectByDepartmentId" parameterType="java.lang.Long" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        WHERE e.department_id = #{departmentId}
+    </select>
+    
+    <!-- 分页查询职工 -->
+    <select id="selectPage" resultMap="EmployeeWithUserAndDeptMap">
+        SELECT <include refid="With_Join_Column_List" />
+        FROM sys_employee e
+        LEFT JOIN sys_user u ON e.user_id = u.id
+        LEFT JOIN sys_department d ON e.department_id = d.id
+        <where>
+            <if test="name != null and name != ''">
+                AND e.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="departmentId != null">
+                AND e.department_id = #{departmentId}
+            </if>
+            <if test="status != null">
+                AND e.status = #{status}
+            </if>
+        </where>
+        ORDER BY e.id
+    </select>
+</mapper> 

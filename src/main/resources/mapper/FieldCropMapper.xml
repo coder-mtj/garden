@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.FieldCropMapper">
+
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.FieldCrop">
+        <id column="id" property="id"/>
+        <result column="field_id" property="fieldId"/>
+        <result column="crop_id" property="cropId"/>
+        <result column="planting_year" property="plantingYear"/>
+        <result column="vine_age" property="vineAge"/>
+        <result column="area_size" property="areaSize"/>
+        <result column="position_data" property="positionData"/>
+        <result column="plant_density" property="plantDensity"/>
+        <result column="total_plants" property="totalPlants"/>
+        <result column="trellis_type" property="trellisType"/>
+        <result column="irrigation_method" property="irrigationMethod"/>
+        <result column="fertilizer_type" property="fertilizerType"/>
+        <result column="expected_yield" property="expectedYield"/>
+        <result column="actual_yield" property="actualYield"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    
+    <resultMap id="FieldCropResultMap" type="com.bishe.garden.entity.FieldCrop" extends="BaseResultMap">
+        <association property="field" javaType="com.bishe.garden.entity.Field">
+            <id column="f_id" property="id"/>
+            <result column="f_field_code" property="fieldCode"/>
+            <result column="f_field_name" property="fieldName"/>
+            <result column="f_area" property="area"/>
+            <result column="f_soil_type" property="soilType"/>
+            <result column="f_status" property="status"/>
+        </association>
+        <association property="crop" javaType="com.bishe.garden.entity.GrapeCrop">
+            <id column="c_id" property="id"/>
+            <result column="c_crop_code" property="cropCode"/>
+            <result column="c_crop_name" property="cropName"/>
+            <result column="c_variety" property="variety"/>
+            <result column="c_color" property="color"/>
+            <result column="c_status" property="status"/>
+        </association>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, field_id, crop_id, planting_year, vine_age, area_size, position_data, plant_density,
+        total_plants, trellis_type, irrigation_method, fertilizer_type, expected_yield,
+        actual_yield, status, remark, create_time, update_time
+    </sql>
+    
+    <insert id="insert" parameterType="com.bishe.garden.entity.FieldCrop" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO agri_field_crop (
+            field_id, crop_id, planting_year, vine_age, area_size, position_data, plant_density,
+            total_plants, trellis_type, irrigation_method, fertilizer_type, expected_yield,
+            actual_yield, status, remark, create_time, update_time
+        ) VALUES (
+            #{fieldId}, #{cropId}, #{plantingYear}, #{vineAge}, #{areaSize}, #{positionData}, #{plantDensity},
+            #{totalPlants}, #{trellisType}, #{irrigationMethod}, #{fertilizerType}, #{expectedYield},
+            #{actualYield}, #{status}, #{remark}, #{createTime}, #{updateTime}
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.bishe.garden.entity.FieldCrop">
+        UPDATE agri_field_crop
+        <set>
+            <if test="fieldId != null">field_id = #{fieldId},</if>
+            <if test="cropId != null">crop_id = #{cropId},</if>
+            <if test="plantingYear != null">planting_year = #{plantingYear},</if>
+            <if test="vineAge != null">vine_age = #{vineAge},</if>
+            <if test="areaSize != null">area_size = #{areaSize},</if>
+            <if test="positionData != null">position_data = #{positionData},</if>
+            <if test="plantDensity != null">plant_density = #{plantDensity},</if>
+            <if test="totalPlants != null">total_plants = #{totalPlants},</if>
+            <if test="trellisType != null">trellis_type = #{trellisType},</if>
+            <if test="irrigationMethod != null">irrigation_method = #{irrigationMethod},</if>
+            <if test="fertilizerType != null">fertilizer_type = #{fertilizerType},</if>
+            <if test="expectedYield != null">expected_yield = #{expectedYield},</if>
+            <if test="actualYield != null">actual_yield = #{actualYield},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM agri_field_crop WHERE id = #{id}
+    </delete>
+    
+    <select id="selectById" parameterType="java.lang.Long" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        WHERE fc.id = #{id}
+    </select>
+    
+    <select id="selectByFieldId" parameterType="java.lang.Long" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        WHERE fc.field_id = #{fieldId}
+        ORDER BY fc.id
+    </select>
+    
+    <select id="selectByCropId" parameterType="java.lang.Long" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        WHERE fc.crop_id = #{cropId}
+        ORDER BY fc.id
+    </select>
+    
+    <select id="selectAll" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        ORDER BY fc.id
+    </select>
+    
+    <select id="selectByCondition" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        <where>
+            <if test="fieldId != null">
+                AND fc.field_id = #{fieldId}
+            </if>
+            <if test="cropId != null">
+                AND fc.crop_id = #{cropId}
+            </if>
+            <if test="plantingYear != null">
+                AND fc.planting_year = #{plantingYear}
+            </if>
+            <if test="status != null">
+                AND fc.status = #{status}
+            </if>
+        </where>
+        ORDER BY fc.id
+    </select>
+    
+    <select id="selectByPage" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        <where>
+            <if test="fieldId != null">
+                AND fc.field_id = #{fieldId}
+            </if>
+            <if test="cropId != null">
+                AND fc.crop_id = #{cropId}
+            </if>
+            <if test="plantingYear != null">
+                AND fc.planting_year = #{plantingYear}
+            </if>
+            <if test="status != null">
+                AND fc.status = #{status}
+            </if>
+        </where>
+        ORDER BY fc.id
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="countByCondition" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM agri_field_crop fc
+        <where>
+            <if test="fieldId != null">
+                AND fc.field_id = #{fieldId}
+            </if>
+            <if test="cropId != null">
+                AND fc.crop_id = #{cropId}
+            </if>
+            <if test="plantingYear != null">
+                AND fc.planting_year = #{plantingYear}
+            </if>
+            <if test="status != null">
+                AND fc.status = #{status}
+            </if>
+        </where>
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE agri_field_crop
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+    
+    <select id="selectByYearAndIds" resultMap="FieldCropResultMap">
+        SELECT 
+            fc.id, fc.field_id, fc.crop_id, fc.planting_year, fc.vine_age, fc.area_size, 
+            fc.position_data, fc.plant_density, fc.total_plants, fc.trellis_type, fc.irrigation_method, 
+            fc.fertilizer_type, fc.expected_yield, fc.actual_yield, fc.status, 
+            fc.remark, fc.create_time, fc.update_time,
+            f.id as f_id, f.field_code as f_field_code, f.field_name as f_field_name, 
+            f.area as f_area, f.soil_type as f_soil_type, f.status as f_status,
+            c.id as c_id, c.crop_code as c_crop_code, c.crop_name as c_crop_name,
+            c.variety as c_variety, c.color as c_color, c.status as c_status
+        FROM agri_field_crop fc
+        LEFT JOIN agri_field f ON fc.field_id = f.id
+        LEFT JOIN agri_crop c ON fc.crop_id = c.id
+        WHERE fc.planting_year = #{plantingYear}
+        <if test="fieldId != null">
+            AND fc.field_id = #{fieldId}
+        </if>
+        <if test="cropId != null">
+            AND fc.crop_id = #{cropId}
+        </if>
+        ORDER BY fc.id
+    </select>
+    
+</mapper> 

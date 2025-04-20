@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bishe.garden.mapper.AgriculturalToolMapper">
+    
+    <resultMap id="BaseResultMap" type="com.bishe.garden.entity.AgriculturalTool">
+        <id column="id" property="id" />
+        <result column="tool_code" property="toolCode" />
+        <result column="tool_name" property="toolName" />
+        <result column="tool_type" property="toolType" />
+        <result column="brand" property="brand" />
+        <result column="model" property="model" />
+        <result column="purchase_date" property="purchaseDate" />
+        <result column="price" property="price" />
+        <result column="status" property="status" />
+        <result column="location" property="location" />
+        <result column="maintenance_cycle" property="maintenanceCycle" />
+        <result column="last_maintenance_date" property="lastMaintenanceDate" />
+        <result column="next_maintenance_date" property="nextMaintenanceDate" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        id, tool_code, tool_name, tool_type, brand, model, purchase_date, price, status, 
+        location, maintenance_cycle, last_maintenance_date, next_maintenance_date, 
+        create_time, update_time, remark
+    </sql>
+    
+    <insert id="insert" parameterType="com.bishe.garden.entity.AgriculturalTool" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO agri_tool (
+            tool_code, tool_name, tool_type, brand, model, purchase_date, price, status, 
+            location, maintenance_cycle, last_maintenance_date, next_maintenance_date,
+            create_time, update_time, remark
+        ) VALUES (
+            #{toolCode}, #{toolName}, #{toolType}, #{brand}, #{model}, #{purchaseDate}, 
+            #{price}, #{status}, #{location}, #{maintenanceCycle}, #{lastMaintenanceDate}, 
+            #{nextMaintenanceDate}, NOW(), NOW(), #{remark}
+        )
+    </insert>
+    
+    <update id="updateById" parameterType="com.bishe.garden.entity.AgriculturalTool">
+        UPDATE agri_tool
+        <set>
+            <if test="toolCode != null">tool_code = #{toolCode},</if>
+            <if test="toolName != null">tool_name = #{toolName},</if>
+            <if test="toolType != null">tool_type = #{toolType},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="purchaseDate != null">purchase_date = #{purchaseDate},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="maintenanceCycle != null">maintenance_cycle = #{maintenanceCycle},</if>
+            <if test="lastMaintenanceDate != null">last_maintenance_date = #{lastMaintenanceDate},</if>
+            <if test="nextMaintenanceDate != null">next_maintenance_date = #{nextMaintenanceDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <update id="updateStatus">
+        UPDATE agri_tool
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById">
+        DELETE FROM agri_tool
+        WHERE id = #{id}
+    </delete>
+    
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        WHERE id = #{id}
+    </select>
+    
+    <select id="selectByToolCode" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        WHERE tool_code = #{toolCode}
+    </select>
+    
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        WHERE 1=1
+        <if test="toolName != null and toolName != ''">
+            AND tool_name LIKE CONCAT('%', #{toolName}, '%')
+        </if>
+        <if test="toolType != null and toolType != ''">
+            AND tool_type = #{toolType}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        WHERE 1=1
+        <if test="toolName != null and toolName != ''">
+            AND tool_name LIKE CONCAT('%', #{toolName}, '%')
+        </if>
+        <if test="toolType != null and toolType != ''">
+            AND tool_type = #{toolType}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="selectNeedMaintenance" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM agri_tool
+        WHERE next_maintenance_date &lt;= #{currentDate}
+        AND status = 1
+        ORDER BY next_maintenance_date ASC
+    </select>
+    
+</mapper> 
