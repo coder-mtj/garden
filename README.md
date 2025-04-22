@@ -140,7 +140,7 @@ src/main/resources/
 
 ## 许可证
 
-MIT License
+HIT License
 
 ## 联系方式
 
