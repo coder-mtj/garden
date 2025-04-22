@@ -99,25 +99,4 @@ public class AuthController {
         
         return Result.success(result);
     }
-    
-    /**
-     * 刷新Token
-     * @param token 旧的Token
-     * @return 新的Token
-     */
-    @PostMapping("/refresh")
-    public Result<String> refreshToken(@RequestHeader("Authorization") String token) {
-        try {
-            // 移除Bearer前缀（如果存在）
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-            
-            // 刷新Token
-            String newToken = jwtUtil.refreshToken(token);
-            return Result.success(newToken);
-        } catch (Exception e) {
-            return Result.error("Token刷新失败");
-        }
-    }
 } 

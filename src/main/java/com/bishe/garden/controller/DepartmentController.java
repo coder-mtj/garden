@@ -6,6 +6,8 @@ import com.bishe.garden.entity.Department;
 import com.bishe.garden.entity.Employee;
 import com.bishe.garden.service.DepartmentService;
 import com.bishe.garden.service.EmployeeService;
+import com.bishe.garden.util.TokenValidationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +28,23 @@ public class DepartmentController {
     @Autowired
     private EmployeeService employeeService;
     
+    @Autowired
+    private TokenValidationUtil tokenValidationUtil;
+    
     /**
      * 添加部门信息
      * @param department 部门信息
+     * @param request HTTP请求
      * @return 添加结果
      */
     @PostMapping("/add")
-    public Result<String> add(@RequestBody Department department) {
+    public Result<String> add(@RequestBody Department department, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查部门编码是否已存在
         Department existDepartment = departmentService.getByDeptCode(department.getDeptCode());
         if (existDepartment != null) {
@@ -76,10 +88,17 @@ public class DepartmentController {
     /**
      * 更新部门信息
      * @param department 部门信息
+     * @param request HTTP请求
      * @return 更新结果
      */
     @PutMapping("/update")
-    public Result<String> update(@RequestBody Department department) {
+    public Result<String> update(@RequestBody Department department, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查部门是否存在
         Department existDepartment = departmentService.getById(department.getId());
         if (existDepartment == null) {
@@ -123,10 +142,17 @@ public class DepartmentController {
     /**
      * 删除部门信息
      * @param id 部门ID
+     * @param request HTTP请求
      * @return 删除结果
      */
     @DeleteMapping("/delete/{id}")
-    public Result<String> delete(@PathVariable Long id) {
+    public Result<String> delete(@PathVariable Long id, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查部门是否存在
         Department department = departmentService.getById(id);
         if (department == null) {
@@ -150,10 +176,17 @@ public class DepartmentController {
     /**
      * 根据ID查询部门信息
      * @param id 部门ID
+     * @param request HTTP请求
      * @return 部门信息
      */
     @GetMapping("/get/{id}")
-    public Result<Department> getById(@PathVariable Long id) {
+    public Result<Department> getById(@PathVariable Long id, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         Department department = departmentService.getById(id);
         if (department != null) {
             // 如果有负责人，获取负责人信息
@@ -169,10 +202,17 @@ public class DepartmentController {
     
     /**
      * 查询所有部门信息
+     * @param request HTTP请求
      * @return 部门列表
      */
     @GetMapping("/list")
-    public Result<List<Department>> list() {
+    public Result<List<Department>> list(HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         List<Department> departmentList = departmentService.listAll();
         // 设置部门负责人信息
         for (Department dept : departmentList) {
@@ -190,6 +230,7 @@ public class DepartmentController {
      * @param pageSize 每页数量
      * @param deptName 部门名称（模糊查询）
      * @param status 状态
+     * @param request HTTP请求
      * @return 部门分页结果
      */
     @GetMapping("/page")
@@ -197,7 +238,14 @@ public class DepartmentController {
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String deptName,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         PageResult<Department> pageResult = departmentService.page(pageNum, pageSize, deptName, status);
         // 设置部门负责人信息
         for (Department dept : pageResult.getList()) {

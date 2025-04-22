@@ -4,11 +4,12 @@ import com.bishe.garden.entity.AgriculturalTool;
 import com.bishe.garden.service.AgriculturalToolService;
 import com.bishe.garden.common.Result;
 import com.bishe.garden.common.PageResult;
+import com.bishe.garden.util.TokenValidationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 /**
  * 农业工具控制器
@@ -20,12 +21,21 @@ public class AgriculturalToolController {
     @Autowired
     private AgriculturalToolService agriculturalToolService;
     
+    @Autowired
+    private TokenValidationUtil tokenValidationUtil;
+    
     /**
      * 添加工具
      */
     @PostMapping("/add")
-    public Result<?> add(@RequestBody AgriculturalTool tool) {
+    public Result<?> add(@RequestBody AgriculturalTool tool, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = agriculturalToolService.save(tool);
             if (success) {
                 return Result.success("添加成功");
@@ -41,8 +51,14 @@ public class AgriculturalToolController {
      * 更新工具
      */
     @PutMapping("/update")
-    public Result<?> update(@RequestBody AgriculturalTool tool) {
+    public Result<?> update(@RequestBody AgriculturalTool tool, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = agriculturalToolService.update(tool);
             if (success) {
                 return Result.success("更新成功");
@@ -58,8 +74,14 @@ public class AgriculturalToolController {
      * 删除工具
      */
     @DeleteMapping("/delete/{id}")
-    public Result<?> delete(@PathVariable Long id) {
+    public Result<?> delete(@PathVariable Long id, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = agriculturalToolService.delete(id);
             if (success) {
                 return Result.success("删除成功");
@@ -75,8 +97,14 @@ public class AgriculturalToolController {
      * 根据ID查询工具
      */
     @GetMapping("/get/{id}")
-    public Result<AgriculturalTool> getById(@PathVariable Long id) {
+    public Result<AgriculturalTool> getById(@PathVariable Long id, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             AgriculturalTool tool = agriculturalToolService.getById(id);
             if (tool != null) {
                 return Result.success(tool);
@@ -92,8 +120,14 @@ public class AgriculturalToolController {
      * 根据工具编码查询工具
      */
     @GetMapping("/getByCode")
-    public Result<AgriculturalTool> getByCode(@RequestParam String toolCode) {
+    public Result<AgriculturalTool> getByCode(@RequestParam String toolCode, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             AgriculturalTool tool = agriculturalToolService.getByToolCode(toolCode);
             if (tool != null) {
                 return Result.success(tool);
@@ -109,8 +143,14 @@ public class AgriculturalToolController {
      * 查询所有工具
      */
     @GetMapping("/list")
-    public Result<List<AgriculturalTool>> list() {
+    public Result<List<AgriculturalTool>> list(HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<AgriculturalTool> tools = agriculturalToolService.listAll();
             return Result.success(tools);
         } catch (Exception e) {
@@ -125,8 +165,15 @@ public class AgriculturalToolController {
     public Result<List<AgriculturalTool>> search(
             @RequestParam(required = false) String toolName,
             @RequestParam(required = false) String toolType,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<AgriculturalTool> tools = agriculturalToolService.listByCondition(toolName, toolType, status);
             return Result.success(tools);
         } catch (Exception e) {
@@ -143,8 +190,15 @@ public class AgriculturalToolController {
             @RequestParam(required = false) Integer pageSize,
             @RequestParam(required = false) String toolName,
             @RequestParam(required = false) String toolType,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             PageResult<AgriculturalTool> pageResult = agriculturalToolService.page(
                 pageNum, pageSize, toolName, toolType, status);
             return Result.success(pageResult);
@@ -157,8 +211,14 @@ public class AgriculturalToolController {
      * 查询需要维护的工具
      */
     @GetMapping("/needMaintenance")
-    public Result<List<AgriculturalTool>> needMaintenance() {
+    public Result<List<AgriculturalTool>> needMaintenance(HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<AgriculturalTool> tools = agriculturalToolService.listNeedMaintenance();
             return Result.success(tools);
         } catch (Exception e) {
@@ -170,8 +230,17 @@ public class AgriculturalToolController {
      * 更新工具状态
      */
     @PutMapping("/updateStatus")
-    public Result<?> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
+    public Result<?> updateStatus(
+            @RequestParam Long id, 
+            @RequestParam Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = agriculturalToolService.updateStatus(id, status);
             if (success) {
                 return Result.success("状态更新成功");

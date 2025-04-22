@@ -5,6 +5,8 @@ import com.bishe.garden.common.PageResult;
 import com.bishe.garden.common.Result;
 import com.bishe.garden.entity.User;
 import com.bishe.garden.service.UserService;
+import com.bishe.garden.util.TokenValidationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +24,22 @@ public class UserController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private TokenValidationUtil tokenValidationUtil;
+    
     /**
      * 根据ID查询用户
      * @param id 用户ID
      * @return 用户信息
      */
     @GetMapping("/{id}")
-    public Result<User> getById(@PathVariable Long id) {
+    public Result<User> getById(@PathVariable Long id, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         User user = userService.getById(id);
         if (user != null) {
             return Result.success(user);
@@ -42,7 +53,13 @@ public class UserController {
      * @return 用户列表
      */
     @GetMapping("/list")
-    public Result<List<User>> list() {
+    public Result<List<User>> list(HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         List<User> userList = userService.listAll();
         return Result.success(userList);
     }
@@ -53,7 +70,15 @@ public class UserController {
      * @return 用户列表
      */
     @PostMapping("/list/condition")
-    public Result<List<User>> listByCondition(@RequestBody(required = false) User user) {
+    public Result<List<User>> listByCondition(
+            @RequestBody(required = false) User user,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         Map<String, Object> params = buildSearchParams(user);
         List<User> userList = userService.listByCondition(params);
         return Result.success(userList);
@@ -68,7 +93,14 @@ public class UserController {
     @PostMapping("/page")
     public Result<PageResult<User>> page(
             @RequestBody(required = false) User user,
-            PageRequest pageRequest) {
+            PageRequest pageRequest,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         Map<String, Object> params = buildSearchParams(user);
         
         // 添加排序参数
@@ -100,7 +132,13 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String realName,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
         
         // 构建查询参数
         Map<String, Object> params = new HashMap<>();
@@ -125,7 +163,15 @@ public class UserController {
      * @return 用户列表
      */
     @PostMapping("/list/ids")
-    public Result<List<User>> listByIds(@RequestBody List<Long> ids) {
+    public Result<List<User>> listByIds(
+            @RequestBody List<Long> ids,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         List<User> userList = userService.listByIds(ids);
         return Result.success(userList);
     }
@@ -136,7 +182,15 @@ public class UserController {
      * @return 结果
      */
     @PostMapping
-    public Result<Void> save(@RequestBody User user) {
+    public Result<Void> save(
+            @RequestBody User user,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查用户名是否已存在
         User existUser = userService.getByUsername(user.getUsername());
         if (existUser != null) {
@@ -156,7 +210,15 @@ public class UserController {
      * @return 结果
      */
     @PostMapping("/batch")
-    public Result<Void> saveBatch(@RequestBody List<User> users) {
+    public Result<Void> saveBatch(
+            @RequestBody List<User> users,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查用户名是否已存在
         for (User user : users) {
             User existUser = userService.getByUsername(user.getUsername());
@@ -178,7 +240,15 @@ public class UserController {
      * @return 结果
      */
     @PutMapping
-    public Result<Void> update(@RequestBody User user) {
+    public Result<Void> update(
+            @RequestBody User user,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         if (user.getId() == null) {
             return Result.error("用户ID不能为空");
         }
@@ -204,7 +274,15 @@ public class UserController {
      * @return 结果
      */
     @DeleteMapping("/{id}")
-    public Result<Void> remove(@PathVariable Long id) {
+    public Result<Void> remove(
+            @PathVariable Long id,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         if (userService.removeById(id)) {
             return Result.success();
         } else {
@@ -218,7 +296,15 @@ public class UserController {
      * @return 结果
      */
     @DeleteMapping("/batch")
-    public Result<Void> removeBatch(@RequestBody List<Long> ids) {
+    public Result<Void> removeBatch(
+            @RequestBody List<Long> ids,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         if (userService.removeByIds(ids)) {
             return Result.success();
         } else {
@@ -233,7 +319,16 @@ public class UserController {
      * @return 结果
      */
     @PutMapping("/{id}/status/{status}")
-    public Result<Void> updateStatus(@PathVariable Long id, @PathVariable Integer status) {
+    public Result<Void> updateStatus(
+            @PathVariable Long id,
+            @PathVariable Integer status,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         if (userService.updateStatus(id, status)) {
             return Result.success();
         } else {
@@ -248,7 +343,16 @@ public class UserController {
      * @return 结果
      */
     @PutMapping("/batch/status/{status}")
-    public Result<Void> updateStatusBatch(@RequestBody List<Long> ids, @PathVariable Integer status) {
+    public Result<Void> updateStatusBatch(
+            @RequestBody List<Long> ids,
+            @PathVariable Integer status,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         if (userService.updateStatusBatch(ids, status)) {
             return Result.success();
         } else {

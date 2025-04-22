@@ -4,6 +4,8 @@ import com.bishe.garden.entity.Field;
 import com.bishe.garden.service.FieldService;
 import com.bishe.garden.common.Result;
 import com.bishe.garden.common.PageResult;
+import com.bishe.garden.util.TokenValidationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,21 @@ public class FieldController {
     @Autowired
     private FieldService fieldService;
     
+    @Autowired
+    private TokenValidationUtil tokenValidationUtil;
+    
     /**
      * 添加田块
      */
     @PostMapping("/add")
-    public Result<?> add(@RequestBody Field field) {
+    public Result<?> add(@RequestBody Field field, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = fieldService.add(field);
             if (success) {
                 return Result.success("添加成功");
@@ -40,8 +51,14 @@ public class FieldController {
      * 更新田块
      */
     @PutMapping("/update")
-    public Result<?> update(@RequestBody Field field) {
+    public Result<?> update(@RequestBody Field field, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = fieldService.update(field);
             if (success) {
                 return Result.success("更新成功");
@@ -57,8 +74,14 @@ public class FieldController {
      * 删除田块
      */
     @DeleteMapping("/delete/{id}")
-    public Result<?> delete(@PathVariable Long id) {
+    public Result<?> delete(@PathVariable Long id, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = fieldService.delete(id);
             if (success) {
                 return Result.success("删除成功");
@@ -74,8 +97,14 @@ public class FieldController {
      * 根据ID查询田块
      */
     @GetMapping("/get/{id}")
-    public Result<Field> getById(@PathVariable Long id) {
+    public Result<Field> getById(@PathVariable Long id, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             Field field = fieldService.getById(id);
             if (field != null) {
                 return Result.success(field);
@@ -91,8 +120,14 @@ public class FieldController {
      * 根据田块编号查询田块
      */
     @GetMapping("/getByCode")
-    public Result<Field> getByCode(@RequestParam String fieldCode) {
+    public Result<Field> getByCode(@RequestParam String fieldCode, HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             Field field = fieldService.getByFieldCode(fieldCode);
             if (field != null) {
                 return Result.success(field);
@@ -108,8 +143,14 @@ public class FieldController {
      * 查询所有田块
      */
     @GetMapping("/list")
-    public Result<List<Field>> list() {
+    public Result<List<Field>> list(HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<Field> fields = fieldService.getAll();
             return Result.success(fields);
         } catch (Exception e) {
@@ -124,8 +165,15 @@ public class FieldController {
     public Result<List<Field>> search(
             @RequestParam(required = false) String fieldName,
             @RequestParam(required = false) String soilType,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<Field> fields = fieldService.getByCondition(fieldName, soilType, status);
             return Result.success(fields);
         } catch (Exception e) {
@@ -142,8 +190,15 @@ public class FieldController {
             @RequestParam(required = false, defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String fieldName,
             @RequestParam(required = false) String soilType,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return Result.error(validationResult.getMessage());
+            }
+            
             List<Field> fields = fieldService.getByPage(pageNum, pageSize, fieldName, soilType, status);
             int total = fieldService.count(fieldName, soilType, status);
             
@@ -158,8 +213,17 @@ public class FieldController {
      * 更新田块状态
      */
     @PutMapping("/updateStatus")
-    public Result<?> updateStatus(@RequestParam Long id, @RequestParam Integer status) {
+    public Result<?> updateStatus(
+            @RequestParam Long id, 
+            @RequestParam Integer status,
+            HttpServletRequest request) {
         try {
+            // 验证token
+            Result<?> validationResult = tokenValidationUtil.validateToken(request);
+            if (validationResult != null) {
+                return validationResult;
+            }
+            
             boolean success = fieldService.updateStatus(id, status);
             if (success) {
                 return Result.success("状态更新成功");

@@ -21,26 +21,26 @@
 
 ### 1. 添加田块作物关系
 
-- **接口**: `/api/fieldcrop/add`
+- **接口**: `/add`
 - **方法**: POST
-- **描述**: 添加新的田块作物关系记录
+- **描述**: 添加一条田块与作物的关联记录
 - **请求体**:
   ```json
   {
-    "fieldId": 1,           // 田块ID
-    "cropId": 1,            // 作物ID
-    "plantingYear": 2023,   // 种植年份
-    "plantMonth": 3,        // 种植月份
-    "plantArea": 10.5,      // 种植面积（亩）
-    "areaData": "[{...}]",  // 种植区域多边形坐标数据(JSON格式)
-    "plantCount": 1000,     // 种植数量（株）
-    "estimatedYield": 5000, // 预计产量（千克）
-    "frameType": "篱架",     // 架式
-    "irrigationType": "滴灌", // 灌溉方式
-    "fertilizationType": "有机肥", // 施肥方式
-    "estimatedIncome": 50000, // 预计收入（元）
-    "status": 1,            // 状态：0-已结束，1-生长中
-    "remark": "备注信息"     // 备注信息
+    "fieldId": 1,         // 田块ID
+    "cropId": 2,          // 作物ID
+    "plantingYear": 2023, // 种植年份
+    "plantArea": 10.5,    // 种植面积，单位亩
+    "plantDate": "2023-04-15", // 种植日期
+    "expectedYield": 1050.0,   // 预期产量，单位千克
+    "actualYield": 0,          // 实际产量，单位千克
+    "harvestDate": null,       // 收获日期
+    "plantingLocation": "{\"type\":\"Polygon\",\"coordinates\":[[...]]}", // 种植区域坐标
+    "irrigationMethod": "滴灌", // 灌溉方式
+    "fertilizerUsage": "有机肥", // 施肥方式
+    "diseaseControl": "生物防治", // 病虫害防治
+    "remarks": "测试种植",       // 备注
+    "status": 1                // 状态，1:正常，0:禁用
   }
   ```
 - **响应示例**:
@@ -54,23 +54,31 @@
 
 ### 2. 批量添加田块作物关系
 
-- **接口**: `/api/fieldcrop/batchAdd`
+- **接口**: `/batchAdd`
 - **方法**: POST
-- **描述**: 批量添加多条田块作物关系记录
+- **描述**: 批量添加多条田块与作物的关联记录
 - **请求体**:
   ```json
   [
     {
       "fieldId": 1,
-      "cropId": 1,
+      "cropId": 2,
       "plantingYear": 2023,
-      // 其他字段...
+      "plantArea": 10.5,
+      "plantDate": "2023-04-15",
+      "expectedYield": 1050.0,
+      "actualYield": 0,
+      "status": 1
     },
     {
       "fieldId": 1,
-      "cropId": 2,
+      "cropId": 3,
       "plantingYear": 2023,
-      // 其他字段...
+      "plantArea": 5.0,
+      "plantDate": "2023-04-20",
+      "expectedYield": 500.0,
+      "actualYield": 0,
+      "status": 1
     }
   ]
   ```
@@ -85,28 +93,21 @@
 
 ### 3. 更新田块作物关系
 
-- **接口**: `/api/fieldcrop/update`
+- **接口**: `/update`
 - **方法**: PUT
-- **描述**: 更新现有的田块作物关系记录
+- **描述**: 更新已有的田块作物关系记录
 - **请求体**:
   ```json
   {
-    "id": 1,               // 记录ID
-    "fieldId": 1,          // 田块ID
-    "cropId": 1,           // 作物ID
-    "plantingYear": 2023,  // 种植年份
-    "plantMonth": 3,       // 种植月份
-    "plantArea": 10.5,     // 种植面积（亩）
-    "areaData": "[{...}]", // 种植区域多边形坐标数据(JSON格式)
-    "plantCount": 1000,    // 种植数量（株）
-    "estimatedYield": 5000, // 预计产量（千克）
-    "frameType": "篱架",    // 架式
-    "irrigationType": "滴灌", // 灌溉方式
-    "fertilizationType": "有机肥", // 施肥方式
-    "estimatedIncome": 50000, // 预计收入（元）
-    "actualIncome": 48000,  // 实际收入（元）
-    "status": 1,           // 状态：0-已结束，1-生长中
-    "remark": "更新备注"    // 备注信息
+    "id": 1,              // 记录ID，必填
+    "fieldId": 1,         // 田块ID
+    "cropId": 2,          // 作物ID
+    "plantingYear": 2023, // 种植年份
+    "plantArea": 12.5,    // 更新后的种植面积
+    "expectedYield": 1250.0, // 更新后的预期产量
+    "actualYield": 1150.0,   // 更新后的实际产量
+    "harvestDate": "2023-10-15", // 收获日期
+    "status": 1               // 状态
   }
   ```
 - **响应示例**:
@@ -120,7 +121,7 @@
 
 ### 4. 删除田块作物关系
 
-- **接口**: `/api/fieldcrop/delete/{id}`
+- **接口**: `/delete/{id}`
 - **方法**: DELETE
 - **描述**: 根据ID删除田块作物关系记录
 - **路径参数**:
@@ -136,7 +137,7 @@
 
 ### 5. 批量删除田块作物关系
 
-- **接口**: `/api/fieldcrop/batchDelete`
+- **接口**: `/batchDelete`
 - **方法**: DELETE
 - **描述**: 批量删除多条田块作物关系记录
 - **请求体**:
@@ -154,9 +155,9 @@
 
 ### 6. 根据ID查询田块作物关系
 
-- **接口**: `/api/fieldcrop/get/{id}`
+- **接口**: `/get/{id}`
 - **方法**: GET
-- **描述**: 根据ID查询田块作物关系记录
+- **描述**: 根据ID查询单条田块作物关系记录
 - **路径参数**:
   - `id`: 记录ID
 - **响应示例**:
@@ -167,37 +168,32 @@
     "data": {
       "id": 1,
       "fieldId": 1,
-      "cropId": 1,
+      "fieldName": "东区A田块", // 田块名称
+      "cropId": 2,
+      "cropName": "赤霞珠",    // 作物名称
       "plantingYear": 2023,
-      "plantMonth": 3,
-      "plantArea": 10.5,
-      "areaData": "[{...}]",
-      "plantCount": 1000,
-      "estimatedYield": 5000,
-      "frameType": "篱架",
-      "irrigationType": "滴灌",
-      "fertilizationType": "有机肥",
-      "estimatedIncome": 50000,
-      "actualIncome": 48000,
-      "status": 1,
-      "remark": "备注信息",
+      "plantArea": 12.5,
+      "plantDate": "2023-04-15",
+      "expectedYield": 1250.0,
+      "actualYield": 1150.0,
+      "harvestDate": "2023-10-15",
+      "plantingLocation": "{\"type\":\"Polygon\",\"coordinates\":[[...]]}", 
+      "irrigationMethod": "滴灌",
+      "fertilizerUsage": "有机肥",
+      "diseaseControl": "生物防治",
+      "remarks": "测试种植",
       "createTime": "2023-04-01 10:00:00",
-      "updateTime": "2023-04-01 10:00:00",
-      "field": {
-        // 关联的田块信息
-      },
-      "crop": {
-        // 关联的作物信息
-      }
+      "updateTime": "2023-10-15 15:30:00",
+      "status": 1
     }
   }
   ```
 
 ### 7. 根据田块ID查询关联的作物关系
 
-- **接口**: `/api/fieldcrop/getByFieldId/{fieldId}`
+- **接口**: `/getByFieldId/{fieldId}`
 - **方法**: GET
-- **描述**: 根据田块ID查询所有关联的作物关系记录
+- **描述**: 查询指定田块下的所有作物关联记录
 - **路径参数**:
   - `fieldId`: 田块ID
 - **响应示例**:
@@ -209,14 +205,28 @@
       {
         "id": 1,
         "fieldId": 1,
-        "cropId": 1,
-        // 其他字段...
+        "fieldName": "东区A田块",
+        "cropId": 2,
+        "cropName": "赤霞珠",
+        "plantingYear": 2023,
+        "plantArea": 12.5,
+        "plantDate": "2023-04-15",
+        "expectedYield": 1250.0,
+        "actualYield": 1150.0,
+        "status": 1
       },
       {
         "id": 2,
         "fieldId": 1,
-        "cropId": 2,
-        // 其他字段...
+        "fieldName": "东区A田块",
+        "cropId": 3,
+        "cropName": "梅鹿辄",
+        "plantingYear": 2023,
+        "plantArea": 5.0,
+        "plantDate": "2023-04-20",
+        "expectedYield": 500.0,
+        "actualYield": 480.0,
+        "status": 1
       }
     ]
   }
@@ -224,9 +234,9 @@
 
 ### 8. 根据作物ID查询关联的田块关系
 
-- **接口**: `/api/fieldcrop/getByCropId/{cropId}`
+- **接口**: `/getByCropId/{cropId}`
 - **方法**: GET
-- **描述**: 根据作物ID查询所有关联的田块关系记录
+- **描述**: 查询指定作物的所有田块关联记录
 - **路径参数**:
   - `cropId`: 作物ID
 - **响应示例**:
@@ -238,14 +248,28 @@
       {
         "id": 1,
         "fieldId": 1,
-        "cropId": 1,
-        // 其他字段...
+        "fieldName": "东区A田块",
+        "cropId": 2,
+        "cropName": "赤霞珠",
+        "plantingYear": 2023,
+        "plantArea": 12.5,
+        "plantDate": "2023-04-15",
+        "expectedYield": 1250.0,
+        "actualYield": 1150.0,
+        "status": 1
       },
       {
         "id": 3,
         "fieldId": 2,
-        "cropId": 1,
-        // 其他字段...
+        "fieldName": "南区B田块",
+        "cropId": 2,
+        "cropName": "赤霞珠",
+        "plantingYear": 2023,
+        "plantArea": 8.0,
+        "plantDate": "2023-03-25",
+        "expectedYield": 800.0,
+        "actualYield": 750.0,
+        "status": 1
       }
     ]
   }
@@ -253,13 +277,13 @@
 
 ### 9. 根据年份、田块ID和作物ID查询田块作物关系
 
-- **接口**: `/api/fieldcrop/getByYearAndIds`
+- **接口**: `/getByYearAndIds`
 - **方法**: GET
-- **描述**: 根据种植年份、田块ID和作物ID查询田块作物关系记录
+- **描述**: 根据年份、田块ID和作物ID查询田块作物关系
 - **请求参数**:
-  - `plantingYear`: 种植年份（必填）
-  - `fieldId`: 田块ID（可选）
-  - `cropId`: 作物ID（可选）
+  - `plantingYear`: 种植年份
+  - `fieldId`: 田块ID
+  - `cropId`: 作物ID
 - **响应示例**:
   ```json
   {
@@ -269,28 +293,15 @@
       {
         "id": 1,
         "fieldId": 1,
-        "cropId": 1,
+        "fieldName": "东区A田块",
+        "cropId": 2,
+        "cropName": "赤霞珠",
         "plantingYear": 2023,
-        "plantMonth": 3,
-        "plantArea": 10.5,
-        "areaData": "[{...}]",
-        "plantCount": 1000,
-        "estimatedYield": 5000,
-        "frameType": "篱架",
-        "irrigationType": "滴灌",
-        "fertilizationType": "有机肥",
-        "estimatedIncome": 50000,
-        "actualIncome": 48000,
-        "status": 1,
-        "remark": "备注信息",
-        "createTime": "2023-04-01 10:00:00",
-        "updateTime": "2023-04-01 10:00:00",
-        "field": {
-          // 关联的田块信息
-        },
-        "crop": {
-          // 关联的作物信息
-        }
+        "plantArea": 12.5,
+        "plantDate": "2023-04-15",
+        "expectedYield": 1250.0,
+        "actualYield": 1150.0,
+        "status": 1
       }
     ]
   }
@@ -298,7 +309,7 @@
 
 ### 10. 查询所有田块作物关系
 
-- **接口**: `/api/fieldcrop/list`
+- **接口**: `/list`
 - **方法**: GET
 - **描述**: 查询所有田块作物关系记录
 - **响应示例**:
@@ -326,14 +337,14 @@
 
 ### 11. 条件查询田块作物关系
 
-- **接口**: `/api/fieldcrop/search`
+- **接口**: `/search`
 - **方法**: GET
 - **描述**: 根据条件查询田块作物关系记录
 - **请求参数**:
-  - `fieldId`: 田块ID（可选）
-  - `cropId`: 作物ID（可选）
-  - `plantingYear`: 种植年份（可选）
-  - `status`: 状态（可选，0-已结束，1-生长中）
+  - `fieldId`: 田块ID
+  - `cropId`: 作物ID
+  - `plantingYear`: 种植年份
+  - `status`: 状态
 - **响应示例**:
   ```json
   {
@@ -355,16 +366,16 @@
 
 ### 12. 分页查询
 
-- **接口**: `/api/fieldcrop/page`
+- **接口**: `/page`
 - **方法**: GET
 - **描述**: 分页查询田块作物关系记录
 - **请求参数**:
-  - `pageNum`: 页码，默认1
-  - `pageSize`: 每页记录数，默认10
-  - `fieldId`: 田块ID（可选）
-  - `cropId`: 作物ID（可选）
-  - `plantingYear`: 种植年份（可选）
-  - `status`: 状态（可选，0-已结束，1-生长中）
+  - `pageNum`: 页码
+  - `pageSize`: 每页记录数
+  - `fieldId`: 田块ID
+  - `cropId`: 作物ID
+  - `plantingYear`: 种植年份
+  - `status`: 状态
 - **响应示例**:
   ```json
   {
@@ -380,22 +391,22 @@
         }
         // 更多记录...
       ],
-      "total": 100,
-      "size": 10,
-      "current": 1,
-      "pages": 10
+      "total": 25,
+      "pageNum": 1,
+      "pageSize": 10,
+      "totalPages": 3
     }
   }
   ```
 
 ### 13. 更新状态
 
-- **接口**: `/api/fieldcrop/updateStatus`
+- **接口**: `/updateStatus`
 - **方法**: PUT
 - **描述**: 更新田块作物关系的状态
 - **请求参数**:
   - `id`: 记录ID
-  - `status`: 新状态（0-已结束，1-生长中）
+  - `status`: 新状态
 - **响应示例**:
   ```json
   {
@@ -407,19 +418,19 @@
 
 ### 14. 导出Excel
 
-- **接口**: `/api/fieldcrop/export`
+- **接口**: `/export`
 - **方法**: GET
-- **描述**: 导出田块作物关系数据为Excel文件
+- **描述**: 将田块作物关系数据导出为Excel文件
 - **请求参数**:
-  - `fieldId`: 田块ID（可选）
-  - `cropId`: 作物ID（可选）
-  - `plantingYear`: 种植年份（可选）
-  - `status`: 状态（可选，0-已结束，1-生长中）
-- **响应**: 直接下载Excel文件
+  - `fieldId`: 田块ID
+  - `cropId`: 作物ID
+  - `plantingYear`: 种植年份
+  - `status`: 状态
+- **响应**: 二进制流，Excel文件
 
 ### 15. 导入Excel
 
-- **接口**: `/api/fieldcrop/import`
+- **接口**: `/import`
 - **方法**: POST
 - **描述**: 从Excel文件导入田块作物关系数据
 - **请求**: `multipart/form-data`类型，包含名为`file`的Excel文件
@@ -427,39 +438,39 @@
   ```json
   {
     "code": 200,
-    "msg": "成功导入15条记录",
+    "msg": "成功导入10条记录",
     "data": null
   }
   ```
 
 ### 16. 按年度统计产量
 
-- **接口**: `/api/fieldcrop/statsByYear`
+- **接口**: `/statsByYear`
 - **方法**: GET
-- **描述**: 按年份统计田块作物产量数据
+- **描述**: 统计指定条件下各年度的产量数据
 - **请求参数**:
-  - `fieldId`: 田块ID（可选）
-  - `cropId`: 作物ID（可选）
+  - `fieldId`: 田块ID
+  - `cropId`: 作物ID
 - **响应示例**:
   ```json
   {
     "code": 200,
     "msg": "操作成功",
     "data": {
-      "2021": 4500.5,
-      "2022": 5200.0,
-      "2023": 4800.0
+      "2021": 2500.5,
+      "2022": 2800.0,
+      "2023": 3100.0
     }
   }
   ```
 
 ### 17. 按作物类型统计种植面积
 
-- **接口**: `/api/fieldcrop/statsByCrop`
+- **接口**: `/statsByCrop`
 - **方法**: GET
-- **描述**: 按作物类型统计种植面积
+- **描述**: 统计指定年度内各作物的种植面积
 - **请求参数**:
-  - `plantingYear`: 种植年份（可选）
+  - `plantingYear`: 种植年份
 - **响应示例**:
   ```json
   {
@@ -468,17 +479,16 @@
     "data": {
       "赤霞珠": 25.5,
       "梅鹿辄": 18.0,
-      "霞多丽": 10.5,
-      "品丽珠": 8.0
+      "霞多丽": 15.0
     }
   }
   ```
 
 ### 18. 获取田块使用情况
 
-- **接口**: `/api/fieldcrop/fieldUsage/{fieldId}`
+- **接口**: `/fieldUsage/{fieldId}`
 - **方法**: GET
-- **描述**: 获取特定田块的使用情况统计
+- **描述**: 获取指定田块的使用情况统计
 - **路径参数**:
   - `fieldId`: 田块ID
 - **响应示例**:
@@ -487,25 +497,26 @@
     "code": 200,
     "msg": "操作成功",
     "data": {
-      "totalArea": 50.0,          // 田块总面积
-      "usedArea": 42.5,           // 已使用面积
-      "unusedArea": 7.5,          // 未使用面积
-      "utilizationRate": 0.85,     // 利用率
-      "crops": [                   // 种植的作物列表
+      "fieldId": 1,
+      "fieldName": "东区A田块",
+      "totalArea": 42.5,
+      "usedArea": 40.0,
+      "utilization": 0.94,
+      "cropDistribution": [
         {
           "cropId": 1,
           "cropName": "赤霞珠",
-          "plantArea": 25.5,
-          "proportion": 0.60       // 占比
+          "plantArea": 23.0,
+          "proportion": 0.60
         },
         {
           "cropId": 2,
           "cropName": "梅鹿辄",
           "plantArea": 17.0,
-          "proportion": 0.40       // 占比
+          "proportion": 0.40
         }
       ],
-      "yearlyUsage": {            // 年度使用情况
+      "yearlyUsage": {
         "2021": 35.0,
         "2022": 40.0,
         "2023": 42.5

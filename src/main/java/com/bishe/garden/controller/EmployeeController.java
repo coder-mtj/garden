@@ -4,6 +4,8 @@ import com.bishe.garden.common.PageResult;
 import com.bishe.garden.common.Result;
 import com.bishe.garden.entity.Employee;
 import com.bishe.garden.service.EmployeeService;
+import com.bishe.garden.util.TokenValidationUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +23,23 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
     
+    @Autowired
+    private TokenValidationUtil tokenValidationUtil;
+    
     /**
      * 添加职工信息
      * @param employee 职工信息
+     * @param request HTTP请求
      * @return 添加结果
      */
     @PostMapping("/add")
-    public Result<String> add(@RequestBody Employee employee) {
+    public Result<String> add(@RequestBody Employee employee, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查工号是否已存在
         Employee existEmployee = employeeService.getByEmployeeNo(employee.getEmployeeNo());
         if (existEmployee != null) {
@@ -64,10 +76,17 @@ public class EmployeeController {
     /**
      * 更新职工信息
      * @param employee 职工信息
+     * @param request HTTP请求
      * @return 更新结果
      */
     @PutMapping("/update")
-    public Result<String> update(@RequestBody Employee employee) {
+    public Result<String> update(@RequestBody Employee employee, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查职工是否存在
         Employee existEmployee = employeeService.getById(employee.getId());
         if (existEmployee == null) {
@@ -103,10 +122,17 @@ public class EmployeeController {
     /**
      * 删除职工信息
      * @param id 职工ID
+     * @param request HTTP请求
      * @return 删除结果
      */
     @DeleteMapping("/delete/{id}")
-    public Result<String> delete(@PathVariable Long id) {
+    public Result<String> delete(@PathVariable Long id, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         // 检查职工是否存在
         Employee employee = employeeService.getById(id);
         if (employee == null) {
@@ -124,10 +150,17 @@ public class EmployeeController {
     /**
      * 根据ID查询职工信息
      * @param id 职工ID
+     * @param request HTTP请求
      * @return 职工信息
      */
     @GetMapping("/get/{id}")
-    public Result<Employee> getById(@PathVariable Long id) {
+    public Result<Employee> getById(@PathVariable Long id, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         Employee employee = employeeService.getById(id);
         if (employee != null) {
             return Result.success(employee);
@@ -138,10 +171,17 @@ public class EmployeeController {
     
     /**
      * 查询所有职工信息
+     * @param request HTTP请求
      * @return 职工列表
      */
     @GetMapping("/list")
-    public Result<List<Employee>> list() {
+    public Result<List<Employee>> list(HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         List<Employee> employeeList = employeeService.listAll();
         return Result.success(employeeList);
     }
@@ -149,10 +189,17 @@ public class EmployeeController {
     /**
      * 根据部门ID查询职工信息
      * @param departmentId 部门ID
+     * @param request HTTP请求
      * @return 职工列表
      */
     @GetMapping("/list/department/{departmentId}")
-    public Result<List<Employee>> listByDepartmentId(@PathVariable Long departmentId) {
+    public Result<List<Employee>> listByDepartmentId(@PathVariable Long departmentId, HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         List<Employee> employeeList = employeeService.listByDepartmentId(departmentId);
         return Result.success(employeeList);
     }
@@ -164,6 +211,7 @@ public class EmployeeController {
      * @param name 职工姓名（模糊查询）
      * @param departmentId 部门ID
      * @param status 状态
+     * @param request HTTP请求
      * @return 职工分页结果
      */
     @GetMapping("/page")
@@ -172,7 +220,14 @@ public class EmployeeController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long departmentId,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            HttpServletRequest request) {
+        // 验证token
+        Result<?> validationResult = tokenValidationUtil.validateToken(request);
+        if (validationResult != null) {
+            return Result.error(validationResult.getMessage());
+        }
+        
         PageResult<Employee> pageResult = employeeService.page(pageNum, pageSize, name, departmentId, status);
         return Result.success(pageResult);
     }
