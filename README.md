@@ -145,4 +145,4 @@ src/main/resources/
 ## 联系方式
 
 如有问题或建议，请联系开发团队或提交Issue。 
-[邮箱](mtj295152@gmail.com)
+mtj295152@gmail.com
